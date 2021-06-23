@@ -1,17 +1,7 @@
 var db = require('../dbconnection');
 var common = {
     getSectors: function(callback) {
-        db.query(`SELECT [SectorName]
-      ,[Block]
-      ,[GramPanchayats]
-      ,[Villages]
-      ,[AWCs]
-      ,[SectorSupervisorName]
-      ,[PhoneNumber]
-  FROM [dbo].[sectors]
-GO
-
-`, callback);
+        db.query(`SELECT SectorName ,Block,GramPanchayats,Villages,AWCs,SectorSupervisorName,PhoneNumberFROM sectors`, callback);
     },
 
 

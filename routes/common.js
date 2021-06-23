@@ -12,7 +12,7 @@ router.get('/getPatients/:SHC_id', function(req, res) {
         if (err) {
             res.json(err);
         } else {
-            res.json(rows.recordsets[0]);
+            res.json(rows);
         }
     });
 });
@@ -22,7 +22,7 @@ router.get('/getSectors', function(req, res) {
         if (err) {
             res.json(err);
         } else {
-            res.json(rows.recordsets[0]);
+            res.json(rows);
         }
     });
 });
