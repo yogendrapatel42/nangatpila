@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var common = require('../models/common');
-// const jwt = require('jsonwebtoken');
 const checkAuth = require('../middleware/check-login');
 const CryptoJS = require('crypto-js');
+const fs = require('fs');
+const path = require('path');
 router.get('/', function(req, res) {
     res.json({ msg: "Welcome to Nangat Pila" });
 });
@@ -28,14 +29,22 @@ router.get('/getSectors', function(req, res) {
         }
     });
 });
+router.get('/getQuestions', function(req, res) {
+    common.getQuestions(function(err, rows) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(rows);
+            // res.json(rows.recordsets[0]);
+        }
+    });
+});
 
 router.post('/register', function(req, res) {
     common.register(req.body, function(err, rows) {
         if (err) {
-            console.log(err);
             res.json(err);
         } else {
-            console.log(rows);
             res.json(rows);
             // res.json(rows.recordsets[0]);
         }
@@ -43,6 +52,24 @@ router.post('/register', function(req, res) {
 });
 
 
+router.post('/saveMonthlyVisit', async function(req, res) {
+    // let base64Image = baseImage.split(';base64,').pop();
+
+    let filename = Date.now() + '.jpg';
+    let path = './uploads/' + filename;
+    fs.writeFile(path, req.body.baseImage, { encoding: 'base64' }, function(err) {
+        req.body.baseImage = filename;
+        common.saveMonthlyVisit(req.body, function(err, rows) {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(rows);
+                // res.json(rows.recordsets[0]);
+            }
+        });
+    });
+
+});
 
 
 //#region for ALL USERS
