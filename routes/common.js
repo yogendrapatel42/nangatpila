@@ -1,19 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var common = require('../models/common');
-const checkAuth = require('../middleware/check-login');
+// const checkAuth = require('../middleware/check-login');
 const CryptoJS = require('crypto-js');
 const fs = require('fs');
-const path = require('path');
 router.get('/', function(req, res) {
     res.json({ msg: "Welcome to Nangat Pila" });
 });
 router.get('/getPatients/:SHC_id', function(req, res) {
     common.getPatients(req.params.SHC_id, function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
-            res.json(rows);
+            res.json({ status: "success", result: rows });
             // res.json(rows.recordsets[0]);
         }
     });
@@ -22,9 +21,9 @@ router.get('/getPatients/:SHC_id', function(req, res) {
 router.get('/getSectors', function(req, res) {
     common.getSectors(function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
-            res.json(rows);
+            res.json({ status: "success", result: rows });
             // res.json(rows.recordsets[0]);
         }
     });
@@ -32,9 +31,9 @@ router.get('/getSectors', function(req, res) {
 router.get('/getQuestions', function(req, res) {
     common.getQuestions(function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
-            res.json(rows);
+            res.json({ status: "success", result: rows });
             // res.json(rows.recordsets[0]);
         }
     });
@@ -43,16 +42,16 @@ router.get('/getQuestions', function(req, res) {
 router.post('/register', function(req, res) {
     common.register(req.body, function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
-            res.json(rows);
+            res.json({ status: "success", result: rows });
             // res.json(rows.recordsets[0]);
         }
     });
 });
 
 
-router.post('/saveMonthlyVisit', async function(req, res) {
+router.post('/saveMonthlyVisit', function(req, res) {
     // let base64Image = baseImage.split(';base64,').pop();
 
     let filename = Date.now() + '.jpg';
@@ -61,9 +60,9 @@ router.post('/saveMonthlyVisit', async function(req, res) {
         req.body.baseImage = filename;
         common.saveMonthlyVisit(req.body, function(err, rows) {
             if (err) {
-                res.json(err);
+                res.json({ status: "failed", error: err });
             } else {
-                res.json(rows);
+                res.json({ status: "success", result: rows });
                 // res.json(rows.recordsets[0]);
             }
         });
@@ -77,7 +76,7 @@ router.post('/login', function(req, res) {
     var mobile = req.body.mobile;
     common.login(mobile, function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
 
             if (!rows.length) {
@@ -94,10 +93,10 @@ router.post('/login', function(req, res) {
                             role: rows[0].role
                         }
                         // const token = jwt.sign(response, 'SECreTIsAlwaYSSecRET');
-                    res.json({ token: response, success: 1 });
+                    res.json({ token: response, status: "success" });
                 } else {
                     res.json({
-                        success: 0,
+                        status: "failed",
                         message: `Wrong credential`
                     })
                 }
@@ -114,19 +113,19 @@ router.put('/changePassword', function(req, res) {
 
     common.getCurrentPassword(req.body.UserID, req.body.UserTypeCode, function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
             console.log(rows.recordsets[0][0]);
             if (dePassword == rows.recordsets[0][0].Password) {
                 common.changePassword(deNEWPassword, req.body.UserID, req.body.UserTypeCode, function(err, rows1) {
                     if (err) {
-                        res.json(err);
+                        res.json({ status: "failed", error: err });
                     } else {
-                        res.json({ success: true, message: 'Password changed.' });
+                        res.json({ status: "success", message: 'Password changed.' });
                     }
                 });
             } else {
-                res.json({ success: false, message: 'वर्तमान पासवर्ड गलत है !' });
+                res.json({ status: "failed", message: 'वर्तमान पासवर्ड गलत है !' });
             }
         }
     });
@@ -136,7 +135,7 @@ router.put('/changePassword', function(req, res) {
 router.get('/getDistrict', function(req, res) {
     common.getDistrict(function(err, rows) {
         if (err) {
-            res.json(err);
+            res.json({ status: "failed", error: err });
         } else {
             res.json(rows.recordsets[0]);
         }
